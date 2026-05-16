@@ -127,8 +127,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     Navigator.pushNamed(context, AppRoutes.searchScreen).then((_) => _loadNotes());
   }
 
-  bool get _isTablet => MediaQuery.of(context).size.width >= 600;
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -136,7 +134,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     final subjectGroups = _groupedBySubject;
     final dateGroupOrder = ['Today', 'Yesterday', 'This Week', 'Older'];
     
-    // Fixed: Splitting toList() and sort() into two distinct lines
     final subjectGroupOrder = subjectGroups.keys.toList();
     subjectGroupOrder.sort();
 
@@ -223,6 +220,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               onSubjectSelected: _onSubjectSelected,
             ),
             const SizedBox(height: 8),
+            // Removed Grid check entirely. Forced lists.
             Expanded(
               child: _isLoading
                   ? _buildSkeleton()
@@ -239,8 +237,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           color: theme.colorScheme.primary,
                           backgroundColor: Colors.white,
                           child: _isCategoryView
-                              ? (_isTablet ? _buildTabletCategoryGrid(subjectGroups, subjectGroupOrder) : _buildCategoryList(subjectGroups, subjectGroupOrder))
-                              : (_isTablet ? _buildTabletGrid(dateGroups, dateGroupOrder) : _buildPhoneList(dateGroups, dateGroupOrder)),
+                              ? _buildCategoryList(subjectGroups, subjectGroupOrder)
+                              : _buildPhoneList(dateGroups, dateGroupOrder),
                         ),
             ),
           ],
@@ -294,42 +292,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       for (int i = 0; i < groups[subject]!.length; i++) {
         final note = groups[subject]![i];
         items.add(_AnimatedNoteCard(note: note, index: i, onTap: () => _navigateToDetail(note), onDelete: () async { if (note.id != null) { await _db.deleteNote(note.id!); _loadNotes(); } }));
-      }
-    }
-    items.add(const SizedBox(height: 160));
-    return ListView(padding: const EdgeInsets.symmetric(horizontal: 16), children: items);
-  }
-
-  Widget _buildTabletGrid(Map<String, List<NoteModel>> groups, List<String> order) {
-    final items = <Widget>[];
-    for (final group in order) {
-      if (!groups.containsKey(group) || groups[group]!.isEmpty) continue;
-      items.add(Padding(padding: const EdgeInsets.only(left: 4, bottom: 8, top: 8), child: NoteSectionHeaderWidget(title: group, count: groups[group]!.length)));
-      final notes = groups[group]!;
-      for (int i = 0; i < notes.length; i += 2) {
-        items.add(Row(children: [
-          Expanded(child: _AnimatedNoteCard(note: notes[i], index: i, onTap: () => _navigateToDetail(notes[i]), onDelete: () async { if (notes[i].id != null) { await _db.deleteNote(notes[i].id!); _loadNotes(); } })),
-          const SizedBox(width: 12),
-          if (i + 1 < notes.length) Expanded(child: _AnimatedNoteCard(note: notes[i + 1], index: i + 1, onTap: () => _navigateToDetail(notes[i + 1]), onDelete: () async { if (notes[i + 1].id != null) { await _db.deleteNote(notes[i + 1].id!); _loadNotes(); } })) else const Expanded(child: SizedBox()),
-        ]));
-      }
-    }
-    items.add(const SizedBox(height: 160));
-    return ListView(padding: const EdgeInsets.symmetric(horizontal: 16), children: items);
-  }
-
-  Widget _buildTabletCategoryGrid(Map<String, List<NoteModel>> groups, List<String> order) {
-    final items = <Widget>[];
-    for (final subject in order) {
-      if (!groups.containsKey(subject) || groups[subject]!.isEmpty) continue;
-      items.add(Padding(padding: const EdgeInsets.only(left: 4, bottom: 8, top: 8), child: _SubjectSectionHeader(subject: subject, count: groups[subject]!.length)));
-      final notes = groups[subject]!;
-      for (int i = 0; i < notes.length; i += 2) {
-        items.add(Row(children: [
-          Expanded(child: _AnimatedNoteCard(note: notes[i], index: i, onTap: () => _navigateToDetail(notes[i]), onDelete: () async { if (notes[i].id != null) { await _db.deleteNote(notes[i].id!); _loadNotes(); } })),
-          const SizedBox(width: 12),
-          if (i + 1 < notes.length) Expanded(child: _AnimatedNoteCard(note: notes[i + 1], index: i + 1, onTap: () => _navigateToDetail(notes[i + 1]), onDelete: () async { if (notes[i + 1].id != null) { await _db.deleteNote(notes[i + 1].id!); _loadNotes(); } })) else const Expanded(child: SizedBox()),
-        ]));
       }
     }
     items.add(const SizedBox(height: 160));
@@ -418,12 +380,12 @@ class _SubjectSectionHeader extends StatelessWidget {
         children: [
           Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
           const SizedBox(width: 8),
-          Text(subject, style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w700, color: color)),
+          Text(subject, style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.black87)), 
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(color: color.withAlpha(38), borderRadius: BorderRadius.circular(10)),
-            child: Text('$count', style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
+            child: Text('$count', style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.black87)),
           ),
         ],
       ),

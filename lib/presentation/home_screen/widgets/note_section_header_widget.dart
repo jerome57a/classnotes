@@ -23,7 +23,7 @@ class NoteSectionHeaderWidget extends StatelessWidget {
             style: GoogleFonts.manrope(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: theme.colorScheme.onSurface,
+              color: Colors.black87, 
             ),
           ),
           const SizedBox(width: 8),

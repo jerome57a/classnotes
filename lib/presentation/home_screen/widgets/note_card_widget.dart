@@ -1,4 +1,3 @@
-
 import '../../../core/app_export.dart';
 import '../../../data/models/note_model.dart';
 
@@ -37,12 +36,12 @@ class NoteCardWidget extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 6),
         decoration: BoxDecoration(
-          color: AppTheme.surfaceDark,
+          color: Colors.white, 
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withAlpha(18), width: 1),
+          border: Border.all(color: Colors.black.withAlpha(15), width: 1), 
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(64),
+              color: Colors.black.withAlpha(15), 
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -52,7 +51,6 @@ class NoteCardWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           child: Stack(
             children: [
-              // Left accent bar
               Positioned(
                 left: 0,
                 top: 0,
@@ -77,7 +75,6 @@ class NoteCardWidget extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Top row: subject badge + date
                     Row(
                       children: [
                         StatusBadgeWidget(
@@ -91,19 +88,18 @@ class NoteCardWidget extends StatelessWidget {
                           style: GoogleFonts.manrope(
                             fontSize: 11,
                             fontWeight: FontWeight.w500,
-                            color: theme.colorScheme.outline,
+                            color: Colors.black54, 
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 10),
-                    // Title
                     Text(
                       note.title,
                       style: GoogleFonts.manrope(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: theme.colorScheme.onSurface,
+                        color: Colors.black87, 
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -115,7 +111,7 @@ class NoteCardWidget extends StatelessWidget {
                         style: GoogleFonts.manrope(
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
-                          color: theme.colorScheme.outline,
+                          color: Colors.black87, 
                           height: 1.5,
                         ),
                         maxLines: 2,
@@ -123,12 +119,11 @@ class NoteCardWidget extends StatelessWidget {
                       ),
                     ],
                     const SizedBox(height: 10),
-                    // Bottom row: word count indicator
                     Row(
                       children: [
                         CustomIconWidget(
                           iconName: 'notes',
-                          color: theme.colorScheme.outline,
+                          color: Colors.black54, 
                           size: 14,
                         ),
                         const SizedBox(width: 4),
@@ -136,7 +131,7 @@ class NoteCardWidget extends StatelessWidget {
                           '${note.content.split(' ').where((w) => w.isNotEmpty).length} words',
                           style: GoogleFonts.manrope(
                             fontSize: 11,
-                            color: theme.colorScheme.outline,
+                            color: Colors.black54, 
                             fontWeight: FontWeight.w500,
                           ),
                         ),
