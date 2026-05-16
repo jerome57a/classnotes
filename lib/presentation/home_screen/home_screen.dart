@@ -155,19 +155,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     final dateGroups = _groupedByDate;
     final subjectGroups = _groupedBySubject;
     final dateGroupOrder = ['Today', 'Yesterday', 'This Week', 'Older'];
-    final subjectGroupOrder = subjectGroups.keys.toList()..sort();
+    final subjectGroupOrder = subjectGroups.keys.toList()...sort();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       extendBody: true,
       body: SafeArea(
-        bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             HomeAppBarWidget(noteCount: _allNotes.length),
             const SizedBox(height: 10),
-            // Primary Top Search Bar
+            // Primary Search Component (Top Anchor Only)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: GestureDetector(
@@ -182,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   child: Row(
                     children: [
                       const SizedBox(width: 14),
-                      Icon(Icons.search_rounded, size: 20, color: theme.colorScheme.outline.withColorFilter(const ColorFilter.mode(Colors.black45, BlendMode.srcIn))),
+                      const Icon(Icons.search_rounded, size: 20, color: Colors.black45),
                       const SizedBox(width: 10),
                       Text(
                         'Search notes...',
@@ -194,6 +193,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
             ),
             const SizedBox(height: 16),
+            // Header Content Area (Transparent overlay wrapper removed)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -373,7 +373,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               color: Colors.white,
               borderRadius: BorderRadius.circular(32),
               border: Border.all(color: Colors.black.withAlpha(20), width: 1),
-              boxShadow: [BoxShadow(color: Colors.black.withAlpha(15), blurRadius: 10, offset: const Offset(0, -2))],
+              boxShadow: [BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 10, offset: const Offset(0, -2))],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -396,7 +396,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     onTap: () => setState(() { _selectedNavIndex = 1; }),
                   ),
                 ),
-                const SizedBox(width: 68), // Perfect docking spacing layout constraint
+                const SizedBox(width: 68), // Navigation layout row constraint gap 
                 Expanded(
                   child: _NavItem(
                     iconName: 'category',

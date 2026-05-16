@@ -23,17 +23,17 @@ class AppTheme {
   static const Color subjectCS = Color(0xFF06B6D4);
   static const Color subjectDefault = Color(0xFF94A3B8);
 
-  // Light/White Theme Surfaces (Now applied globally to the dashboard)
-  static const Color backgroundDark = Color(0xFFFFFFFF);     // Changed background to pure white
-  static const Color surfaceDark = Color(0xFFF8F7FF);        // Soft light surface for list containers
-  static const Color surfaceVariantDark = Color(0xFFEDE9FF); // Distinct background tint for input bars
-  static const Color cardDark = Color(0xFFFFFFFF);           // White base cards
+  // Global theme surfaces (Pure White Background System)
+  static const Color backgroundDark = Color(0xFFFFFFFF);     
+  static const Color surfaceDark = Color(0xFFF8F7FF);        
+  static const Color surfaceVariantDark = Color(0xFFEDE9FF); 
+  static const Color cardDark = Color(0xFFFFFFFF);           
 
-  static ThemeData get lightTheme => darkTheme; // Defaulting to our structured darkTheme layout
+  static ThemeData get lightTheme => darkTheme; 
 
   static ThemeData get darkTheme => ThemeData(
     useMaterial3: true,
-    brightness: Brightness.light, // Set brightness to light since background is white
+    brightness: Brightness.light, 
     colorScheme: const ColorScheme.light(
       primary: primary,
       onPrimary: Colors.white,
