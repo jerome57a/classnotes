@@ -31,15 +31,18 @@ class AppTheme {
   static const Color backgroundLight = Color(0xFFF1F0F9);
   static const Color cardLight = Color(0xFFFFFFFF);
 
-  // Dark theme surfaces
-  static const Color backgroundDark = Color(0xFF13111E);
-  static const Color surfaceDark = Color(0xFF1E1A2E);
-  static const Color surfaceVariantDark = Color(0xFF252238);
-  static const Color cardDark = Color(0xff1e1a2ecc);
+  // ----------------------------------------------------
+  // CHANGE DASHBOARD BACKGROUND COLORS HERE
+  // ----------------------------------------------------
+  static const Color backgroundDark = Color(0xFF13111E);      // Main background screen canvas color
+  static const Color surfaceDark = Color(0xFF1E1A2E);         // Base surface container card backgrounds
+  static const Color surfaceVariantDark = Color(0xFF252238);  // Alternate input selection & navigation bar fills
+  static const Color cardDark = Color(0xCC1E1A2E);            // Translucent glass card background blends
+  // ----------------------------------------------------
 
   static ThemeData get lightTheme => ThemeData(
     useMaterial3: true,
-    colorScheme: ColorScheme.light(
+    colorScheme: const ColorScheme.light(
       primary: primary,
       onPrimary: Colors.white,
       primaryContainer: Color(0xFFEDE9FF),
@@ -59,48 +62,48 @@ class AppTheme {
       displayLarge: GoogleFonts.manrope(
         fontSize: 40,
         fontWeight: FontWeight.w800,
-        color: Color(0xFF1A1A2E),
+        color: const Color(0xFF1A1A2E),
       ),
       displayMedium: GoogleFonts.manrope(
         fontSize: 32,
         fontWeight: FontWeight.w700,
-        color: Color(0xFF1A1A2E),
+        color: const Color(0xFF1A1A2E),
       ),
       headlineLarge: GoogleFonts.manrope(
         fontSize: 24,
         fontWeight: FontWeight.w700,
-        color: Color(0xFF1A1A2E),
+        color: const Color(0xFF1A1A2E),
       ),
       headlineMedium: GoogleFonts.manrope(
         fontSize: 20,
         fontWeight: FontWeight.w600,
-        color: Color(0xFF1A1A2E),
+        color: const Color(0xFF1A1A2E),
       ),
       titleLarge: GoogleFonts.manrope(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        color: Color(0xFF1A1A2E),
+        color: const Color(0xFF1A1A2E),
       ),
       titleMedium: GoogleFonts.manrope(
         fontSize: 15,
         fontWeight: FontWeight.w600,
-        color: Color(0xFF1A1A2E),
+        color: const Color(0xFF1A1A2E),
       ),
       bodyLarge: GoogleFonts.manrope(
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        color: Color(0xFF334155),
+        color: const Color(0xFF334155),
       ),
       bodyMedium: GoogleFonts.manrope(
         fontSize: 13,
         fontWeight: FontWeight.w400,
-        color: Color(0xFF475569),
+        color: const Color(0xFF475569),
       ),
       labelSmall: GoogleFonts.manrope(
         fontSize: 11,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.3,
-        color: Color(0xFF64748B),
+        color: const Color(0xFF64748B),
       ),
     ),
     appBarTheme: AppBarThemeData(
@@ -110,9 +113,9 @@ class AppTheme {
       titleTextStyle: GoogleFonts.manrope(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        color: Color(0xFF1A1A2E),
+        color: const Color(0xFF1A1A2E),
       ),
-      iconTheme: IconThemeData(color: Color(0xFF1A1A2E)),
+      iconTheme: const IconThemeData(color: Color(0xFF1A1A2E)),
     ),
     cardTheme: CardThemeData(
       color: cardLight,
@@ -121,21 +124,21 @@ class AppTheme {
     ),
     inputDecorationTheme: InputDecorationThemeData(
       filled: true,
-      fillColor: Color(0xFFF1F0F9),
+      fillColor: const Color(0xFFF1F0F9),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: primary, width: 1.5),
+        borderSide: const BorderSide(color: primary, width: 1.5),
       ),
     ),
   );
 
   static ThemeData get darkTheme => ThemeData(
     useMaterial3: true,
-    colorScheme: ColorScheme.dark(
+    colorScheme: const ColorScheme.dark(
       primary: primary,
       onPrimary: Colors.white,
       primaryContainer: primaryContainer,
@@ -155,48 +158,48 @@ class AppTheme {
       displayLarge: GoogleFonts.manrope(
         fontSize: 40,
         fontWeight: FontWeight.w800,
-        color: Color(0xFFE2E8F0),
+        color: const Color(0xFFE2E8F0),
       ),
       displayMedium: GoogleFonts.manrope(
         fontSize: 32,
         fontWeight: FontWeight.w700,
-        color: Color(0xFFE2E8F0),
+        color: const Color(0xFFE2E8F0),
       ),
       headlineLarge: GoogleFonts.manrope(
         fontSize: 24,
         fontWeight: FontWeight.w700,
-        color: Color(0xFFE2E8F0),
+        color: const Color(0xFFE2E8F0),
       ),
       headlineMedium: GoogleFonts.manrope(
         fontSize: 20,
         fontWeight: FontWeight.w600,
-        color: Color(0xFFE2E8F0),
+        color: const Color(0xFFE2E8F0),
       ),
       titleLarge: GoogleFonts.manrope(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        color: Color(0xFFE2E8F0),
+        color: const Color(0xFFE2E8F0),
       ),
       titleMedium: GoogleFonts.manrope(
         fontSize: 15,
         fontWeight: FontWeight.w600,
-        color: Color(0xFFE2E8F0),
+        color: const Color(0xFFE2E8F0),
       ),
       bodyLarge: GoogleFonts.manrope(
         fontSize: 14,
         fontWeight: FontWeight.w400,
-        color: Color(0xFFCBD5E1),
+        color: const Color(0xFFCBD5E1),
       ),
       bodyMedium: GoogleFonts.manrope(
         fontSize: 13,
         fontWeight: FontWeight.w400,
-        color: Color(0xFF94A3B8),
+        color: const Color(0xFF94A3B8),
       ),
       labelSmall: GoogleFonts.manrope(
         fontSize: 11,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.3,
-        color: Color(0xFF64748B),
+        color: const Color(0xFF64748B),
       ),
     ),
     appBarTheme: AppBarThemeData(
@@ -206,9 +209,9 @@ class AppTheme {
       titleTextStyle: GoogleFonts.manrope(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        color: Color(0xFFE2E8F0),
+        color: const Color(0xFFE2E8F0),
       ),
-      iconTheme: IconThemeData(color: Color(0xFFE2E8F0)),
+      iconTheme: const IconThemeData(color: Color(0xFFE2E8F0)),
     ),
     cardTheme: CardThemeData(
       color: surfaceDark,
@@ -224,21 +227,20 @@ class AppTheme {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: primary, width: 1.5),
+        borderSide: const BorderSide(color: primary, width: 1.5),
       ),
-      labelStyle: GoogleFonts.manrope(color: Color(0xFF94A3B8), fontSize: 14),
-      hintStyle: GoogleFonts.manrope(color: Color(0xFF64748B), fontSize: 14),
-      errorStyle: GoogleFonts.manrope(color: Color(0xFFFCA5A5), fontSize: 12),
+      labelStyle: GoogleFonts.manrope(color: const Color(0xFF94A3B8), fontSize: 14),
+      hintStyle: GoogleFonts.manrope(color: const Color(0xFF64748B), fontSize: 14),
+      errorStyle: GoogleFonts.manrope(color: const Color(0xFFFCA5A5), fontSize: 12),
     ),
-    dividerTheme: DividerThemeData(color: Color(0xFF2A2640), thickness: 1),
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+    dividerTheme: const DividerThemeData(color: Color(0xFF2A2640), thickness: 1),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Colors.transparent,
       selectedItemColor: primary,
       unselectedItemColor: Color(0xFF64748B),
     ),
   );
 
-  // Helper: get subject color
   static Color subjectColor(String subject) {
     switch (subject.toLowerCase()) {
       case 'mathematics':

@@ -176,6 +176,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           children: [
             HomeAppBarWidget(noteCount: _allNotes.length),
             const SizedBox(height: 10),
+            // Primary Top Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: GestureDetector(
@@ -213,6 +214,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
             ),
             const SizedBox(height: 16),
+            // Clean "Your Notes" Title Header Section (Solid Visibility)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -571,7 +573,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       }),
                     ),
                   ),
-                  const SizedBox(width: 68),
+                  const SizedBox(width: 68), // Space for floating circular add button
                   Expanded(
                     child: _NavItem(
                       iconName: 'category',
