@@ -23,11 +23,11 @@ class AppTheme {
   static const Color subjectCS = Color(0xFF06B6D4);
   static const Color subjectDefault = Color(0xFF94A3B8);
 
-  // Global theme surfaces (Pure White Background System)
-  static const Color backgroundDark = Color(0xFFFFFFFF);     
-  static const Color surfaceDark = Color(0xFFF8F7FF);        
-  static const Color surfaceVariantDark = Color(0xFFEDE9FF); 
-  static const Color cardDark = Color(0xFFFFFFFF);           
+  // Pure White Background System
+  static const Color backgroundDark = Colors.white;     
+  static const Color surfaceDark = Colors.white;        
+  static const Color surfaceVariantDark = Color(0xFFF1F5F9); 
+  static const Color cardDark = Colors.white;           
 
   static ThemeData get lightTheme => darkTheme; 
 

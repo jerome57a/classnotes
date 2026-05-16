@@ -12,7 +12,7 @@ class CustomErrorWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark, // Match global dark surface requirement
+      backgroundColor: AppTheme.backgroundDark, 
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -52,7 +52,7 @@ class CustomErrorWidget extends StatelessWidget {
                       color: AppTheme.surfaceDark,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    maxHeight: 150,
+                    constraints: const BoxConstraints(maxHeight: 150),
                     child: SingleChildScrollView(
                       child: Text(
                         errorDetails!.exceptionAsString(),

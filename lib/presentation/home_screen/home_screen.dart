@@ -7,7 +7,6 @@ import './widgets/filter_chips_widget.dart';
 import './widgets/home_app_bar_widget.dart';
 import './widgets/note_card_widget.dart';
 import './widgets/note_section_header_widget.dart';
-import './widgets/quick_capture_bar_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,7 +23,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   bool _isLoading = true;
   int _selectedNavIndex = 0;
   bool _isCategoryView = false;
-  final TextEditingController _quickCaptureController = TextEditingController();
   late AnimationController _fabAnimController;
   late Animation<double> _fabScaleAnim;
 
@@ -44,7 +42,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   @override
   void dispose() {
     _fabAnimController.dispose();
-    _quickCaptureController.dispose();
     super.dispose();
   }
 
@@ -130,23 +127,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     Navigator.pushNamed(context, AppRoutes.searchScreen).then((_) => _loadNotes());
   }
 
-  Future<void> _handleQuickCapture() async {
-    final text = _quickCaptureController.text.trim();
-    if (text.isEmpty) return;
-    final note = NoteModel(
-      title: text,
-      subject: 'General',
-      content: '',
-      colorHex: '#7C6AFA',
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
-    await _db.insertNote(note);
-    _quickCaptureController.clear();
-    HapticFeedback.lightImpact();
-    await _loadNotes();
-  }
-
   bool get _isTablet => MediaQuery.of(context).size.width >= 600;
 
   @override
@@ -155,10 +135,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     final dateGroups = _groupedByDate;
     final subjectGroups = _groupedBySubject;
     final dateGroupOrder = ['Today', 'Yesterday', 'This Week', 'Older'];
-    final subjectGroupOrder = subjectGroups.keys.toList()...sort();
+    
+    // Fixed: Splitting toList() and sort() into two distinct lines
+    final subjectGroupOrder = subjectGroups.keys.toList();
+    subjectGroupOrder.sort();
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: Colors.white,
       extendBody: true,
       body: SafeArea(
         child: Column(
@@ -166,7 +149,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           children: [
             HomeAppBarWidget(noteCount: _allNotes.length),
             const SizedBox(height: 10),
-            // Primary Search Component (Top Anchor Only)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: GestureDetector(
@@ -174,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 child: Container(
                   height: 46,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: Colors.black.withAlpha(15), width: 1),
                   ),
@@ -193,7 +175,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
             ),
             const SizedBox(height: 16),
-            // Header Content Area (Transparent overlay wrapper removed)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -211,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       curve: Curves.easeOutCubic,
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                       decoration: BoxDecoration(
-                        color: _isCategoryView ? theme.colorScheme.primary.withAlpha(30) : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                        color: _isCategoryView ? theme.colorScheme.primary.withAlpha(30) : theme.colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: _isCategoryView ? theme.colorScheme.primary.withAlpha(90) : Colors.black.withAlpha(15), width: 1),
                       ),
@@ -262,7 +243,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               : (_isTablet ? _buildTabletGrid(dateGroups, dateGroupOrder) : _buildPhoneList(dateGroups, dateGroupOrder)),
                         ),
             ),
-            QuickCaptureBarWidget(controller: _quickCaptureController, onSend: _handleQuickCapture),
           ],
         ),
       ),
@@ -396,7 +376,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     onTap: () => setState(() { _selectedNavIndex = 1; }),
                   ),
                 ),
-                const SizedBox(width: 68), // Navigation layout row constraint gap 
+                const SizedBox(width: 68), 
                 Expanded(
                   child: _NavItem(
                     iconName: 'category',
