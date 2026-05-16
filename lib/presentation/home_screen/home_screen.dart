@@ -119,24 +119,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   void _navigateToCreate() {
-    Navigator.pushNamed(
-      context,
-      AppRoutes.noteFormScreen,
-    ).then((_) => _loadNotes());
+    Navigator.pushNamed(context, AppRoutes.noteFormScreen).then((_) => _loadNotes());
   }
 
   void _navigateToDetail(NoteModel note) {
-    Navigator.pushNamed(
-      context,
-      AppRoutes.noteDetailScreen,
-      arguments: note,
-    ).then((_) => _loadNotes());
+    Navigator.pushNamed(context, AppRoutes.noteDetailScreen, arguments: note).then((_) => _loadNotes());
   }
 
   void _navigateToSearch() {
-    Navigator.pushNamed(context, AppRoutes.searchScreen).then((_) {
-      _loadNotes();
-    });
+    Navigator.pushNamed(context, AppRoutes.searchScreen).then((_) => _loadNotes());
   }
 
   Future<void> _handleQuickCapture() async {
@@ -167,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     final subjectGroupOrder = subjectGroups.keys.toList()..sort();
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: theme.scaffoldBackgroundColor,
       extendBody: true,
       body: SafeArea(
         bottom: false,
@@ -184,29 +175,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 child: Container(
                   height: 46,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest,
+                    color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: Colors.white.withAlpha(20),
-                      width: 1,
-                    ),
+                    border: Border.all(color: Colors.black.withAlpha(15), width: 1),
                   ),
                   child: Row(
                     children: [
                       const SizedBox(width: 14),
-                      Icon(
-                        Icons.search_rounded,
-                        size: 20,
-                        color: theme.colorScheme.outline,
-                      ),
+                      Icon(Icons.search_rounded, size: 20, color: theme.colorScheme.outline.withColorFilter(const ColorFilter.mode(Colors.black45, BlendMode.srcIn))),
                       const SizedBox(width: 10),
                       Text(
                         'Search notes...',
-                        style: GoogleFonts.manrope(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: theme.colorScheme.outline,
-                        ),
+                        style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black54),
                       ),
                     ],
                   ),
@@ -214,7 +194,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
             ),
             const SizedBox(height: 16),
-            // Clean "Your Notes" Title Header Section (Solid Visibility)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -222,12 +201,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   Expanded(
                     child: Text(
                       'Your Notes',
-                      style: GoogleFonts.manrope(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        color: theme.colorScheme.onSurface,
-                        height: 1.2,
-                      ),
+                      style: GoogleFonts.manrope(fontSize: 28, fontWeight: FontWeight.w800, color: theme.colorScheme.onSurface, height: 1.2),
                     ),
                   ),
                   GestureDetector(
@@ -235,38 +209,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       curve: Curves.easeOutCubic,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 7,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                       decoration: BoxDecoration(
-                        color: _isCategoryView
-                            ? theme.colorScheme.primary.withAlpha(46)
-                            : theme.colorScheme.surfaceContainerHighest,
+                        color: _isCategoryView ? theme.colorScheme.primary.withAlpha(30) : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: _isCategoryView
-                              ? theme.colorScheme.primary.withAlpha(120)
-                              : Colors.white.withAlpha(20),
-                          width: 1,
-                        ),
+                        border: Border.all(color: _isCategoryView ? theme.colorScheme.primary.withAlpha(90) : Colors.black.withAlpha(15), width: 1),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            _isCategoryView ? Icons.category_rounded : Icons.view_list_rounded,
-                            size: 16,
-                            color: _isCategoryView ? theme.colorScheme.primary : theme.colorScheme.outline,
-                          ),
+                          Icon(_isCategoryView ? Icons.category_rounded : Icons.view_list_rounded, size: 16, color: _isCategoryView ? theme.colorScheme.primary : Colors.black54),
                           const SizedBox(width: 5),
                           Text(
                             _isCategoryView ? 'By Subject' : 'By Date',
-                            style: GoogleFonts.manrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: _isCategoryView ? theme.colorScheme.primary : theme.colorScheme.outline,
-                            ),
+                            style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w600, color: _isCategoryView ? theme.colorScheme.primary : Colors.black54),
                           ),
                         ],
                       ),
@@ -293,29 +249,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       ? EmptyStateWidget(
                           iconName: 'notes',
                           title: 'No notes yet',
-                          subtitle: _selectedSubject == 'All'
-                              ? 'Tap the + button to capture your first class note.'
-                              : 'No notes found for $_selectedSubject.',
+                          subtitle: _selectedSubject == 'All' ? 'Tap the + button to capture your first note.' : 'No notes found for $_selectedSubject.',
                           ctaLabel: 'Create Note',
                           onCta: _navigateToCreate,
                         )
                       : RefreshIndicator(
                           onRefresh: _loadNotes,
                           color: theme.colorScheme.primary,
-                          backgroundColor: AppTheme.surfaceDark,
+                          backgroundColor: Colors.white,
                           child: _isCategoryView
-                              ? (_isTablet
-                                  ? _buildTabletCategoryGrid(subjectGroups, subjectGroupOrder)
-                                  : _buildCategoryList(subjectGroups, subjectGroupOrder))
-                              : (_isTablet
-                                  ? _buildTabletGrid(dateGroups, dateGroupOrder)
-                                  : _buildPhoneList(dateGroups, dateGroupOrder)),
+                              ? (_isTablet ? _buildTabletCategoryGrid(subjectGroups, subjectGroupOrder) : _buildCategoryList(subjectGroups, subjectGroupOrder))
+                              : (_isTablet ? _buildTabletGrid(dateGroups, dateGroupOrder) : _buildPhoneList(dateGroups, dateGroupOrder)),
                         ),
             ),
-            QuickCaptureBarWidget(
-              controller: _quickCaptureController,
-              onSend: _handleQuickCapture,
-            ),
+            QuickCaptureBarWidget(controller: _quickCaptureController, onSend: _handleQuickCapture),
           ],
         ),
       ),
@@ -335,13 +282,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             decoration: BoxDecoration(
               color: theme.colorScheme.primary,
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: theme.colorScheme.primary.withAlpha(115),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
-                ),
-              ],
+              boxShadow: [BoxShadow(color: theme.colorScheme.primary.withAlpha(60), blurRadius: 16, offset: const Offset(0, 6))],
             ),
             child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
           ),
@@ -358,26 +299,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       items.add(NoteSectionHeaderWidget(title: group, count: groups[group]!.length));
       for (int i = 0; i < groups[group]!.length; i++) {
         final note = groups[group]![i];
-        items.add(
-          _AnimatedNoteCard(
-            note: note,
-            index: i,
-            onTap: () => _navigateToDetail(note),
-            onDelete: () async {
-              if (note.id != null) {
-                await _db.deleteNote(note.id!);
-                _loadNotes();
-              }
-            },
-          ),
-        );
+        items.add(_AnimatedNoteCard(note: note, index: i, onTap: () => _navigateToDetail(note), onDelete: () async { if (note.id != null) { await _db.deleteNote(note.id!); _loadNotes(); } }));
       }
     }
     items.add(const SizedBox(height: 160));
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      children: items,
-    );
+    return ListView(padding: const EdgeInsets.symmetric(horizontal: 16), children: items);
   }
 
   Widget _buildCategoryList(Map<String, List<NoteModel>> groups, List<String> order) {
@@ -387,148 +313,51 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       items.add(_SubjectSectionHeader(subject: subject, count: groups[subject]!.length));
       for (int i = 0; i < groups[subject]!.length; i++) {
         final note = groups[subject]![i];
-        items.add(
-          _AnimatedNoteCard(
-            note: note,
-            index: i,
-            onTap: () => _navigateToDetail(note),
-            onDelete: () async {
-              if (note.id != null) {
-                await _db.deleteNote(note.id!);
-                _loadNotes();
-              }
-            },
-          ),
-        );
+        items.add(_AnimatedNoteCard(note: note, index: i, onTap: () => _navigateToDetail(note), onDelete: () async { if (note.id != null) { await _db.deleteNote(note.id!); _loadNotes(); } }));
       }
     }
     items.add(const SizedBox(height: 160));
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      children: items,
-    );
+    return ListView(padding: const EdgeInsets.symmetric(horizontal: 16), children: items);
   }
 
   Widget _buildTabletGrid(Map<String, List<NoteModel>> groups, List<String> order) {
     final items = <Widget>[];
     for (final group in order) {
       if (!groups.containsKey(group) || groups[group]!.isEmpty) continue;
-      items.add(
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8, top: 8),
-          child: NoteSectionHeaderWidget(title: group, count: groups[group]!.length),
-        ),
-      );
+      items.add(Padding(padding: const EdgeInsets.only(left: 4, bottom: 8, top: 8), child: NoteSectionHeaderWidget(title: group, count: groups[group]!.length)));
       final notes = groups[group]!;
       for (int i = 0; i < notes.length; i += 2) {
-        items.add(
-          Row(
-            children: [
-              Expanded(
-                child: _AnimatedNoteCard(
-                  note: notes[i],
-                  index: i,
-                  onTap: () => _navigateToDetail(notes[i]),
-                  onDelete: () async {
-                    if (notes[i].id != null) {
-                      await _db.deleteNote(notes[i].id!);
-                      _loadNotes();
-                    }
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              if (i + 1 < notes.length)
-                Expanded(
-                  child: _AnimatedNoteCard(
-                    note: notes[i + 1],
-                    index: i + 1,
-                    onTap: () => _navigateToDetail(notes[i + 1]),
-                    onDelete: () async {
-                      if (notes[i + 1].id != null) {
-                        await _db.deleteNote(notes[i + 1].id!);
-                        _loadNotes();
-                      }
-                    },
-                  ),
-                )
-              else
-                const Expanded(child: SizedBox()),
-            ],
-          ),
-        );
+        items.add(Row(children: [
+          Expanded(child: _AnimatedNoteCard(note: notes[i], index: i, onTap: () => _navigateToDetail(notes[i]), onDelete: () async { if (notes[i].id != null) { await _db.deleteNote(notes[i].id!); _loadNotes(); } })),
+          const SizedBox(width: 12),
+          if (i + 1 < notes.length) Expanded(child: _AnimatedNoteCard(note: notes[i + 1], index: i + 1, onTap: () => _navigateToDetail(notes[i + 1]), onDelete: () async { if (notes[i + 1].id != null) { await _db.deleteNote(notes[i + 1].id!); _loadNotes(); } })) else const Expanded(child: SizedBox()),
+        ]));
       }
     }
     items.add(const SizedBox(height: 160));
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      children: items,
-    );
+    return ListView(padding: const EdgeInsets.symmetric(horizontal: 16), children: items);
   }
 
   Widget _buildTabletCategoryGrid(Map<String, List<NoteModel>> groups, List<String> order) {
     final items = <Widget>[];
     for (final subject in order) {
       if (!groups.containsKey(subject) || groups[subject]!.isEmpty) continue;
-      items.add(
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8, top: 8),
-          child: _SubjectSectionHeader(subject: subject, count: groups[subject]!.length),
-        ),
-      );
+      items.add(Padding(padding: const EdgeInsets.only(left: 4, bottom: 8, top: 8), child: _SubjectSectionHeader(subject: subject, count: groups[subject]!.length)));
       final notes = groups[subject]!;
       for (int i = 0; i < notes.length; i += 2) {
-        items.add(
-          Row(
-            children: [
-              Expanded(
-                child: _AnimatedNoteCard(
-                  note: notes[i],
-                  index: i,
-                  onTap: () => _navigateToDetail(notes[i]),
-                  onDelete: () async {
-                    if (notes[i].id != null) {
-                      await _db.deleteNote(notes[i].id!);
-                      _loadNotes();
-                    }
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              if (i + 1 < notes.length)
-                Expanded(
-                  child: _AnimatedNoteCard(
-                    note: notes[i + 1],
-                    index: i + 1,
-                    onTap: () => _navigateToDetail(notes[i + 1]),
-                    onDelete: () async {
-                      if (notes[i + 1].id != null) {
-                        await _db.deleteNote(notes[i + 1].id!);
-                        _loadNotes();
-                      }
-                    },
-                  ),
-                )
-              else
-                const Expanded(child: SizedBox()),
-            ],
-          ),
-        );
+        items.add(Row(children: [
+          Expanded(child: _AnimatedNoteCard(note: notes[i], index: i, onTap: () => _navigateToDetail(notes[i]), onDelete: () async { if (notes[i].id != null) { await _db.deleteNote(notes[i].id!); _loadNotes(); } })),
+          const SizedBox(width: 12),
+          if (i + 1 < notes.length) Expanded(child: _AnimatedNoteCard(note: notes[i + 1], index: i + 1, onTap: () => _navigateToDetail(notes[i + 1]), onDelete: () async { if (notes[i + 1].id != null) { await _db.deleteNote(notes[i + 1].id!); _loadNotes(); } })) else const Expanded(child: SizedBox()),
+        ]));
       }
     }
     items.add(const SizedBox(height: 160));
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      children: items,
-    );
+    return ListView(padding: const EdgeInsets.symmetric(horizontal: 16), children: items);
   }
 
   Widget _buildSkeleton() {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: 5,
-      itemBuilder: (_, i) => const NoteCardSkeletonWidget(),
-    );
+    return ListView.builder(padding: const EdgeInsets.symmetric(horizontal: 16), itemCount: 5, itemBuilder: (_, i) => const NoteCardSkeletonWidget());
   }
 
   Widget _buildLiquidGlassNav(ThemeData theme) {
@@ -538,65 +367,55 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(32),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-            child: Container(
-              height: 64,
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceVariantDark.withAlpha(191),
-                borderRadius: BorderRadius.circular(32),
-                border: Border.all(color: Colors.white.withAlpha(26), width: 1),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Expanded(
-                    child: _NavItem(
-                      iconName: 'home',
-                      iconOutlined: 'home_outlined',
-                      label: 'Notes',
-                      isActive: _selectedNavIndex == 0 && !_isCategoryView,
-                      onTap: () => setState(() {
-                        _selectedNavIndex = 0;
-                        _isCategoryView = false;
-                      }),
-                    ),
+          child: Container(
+            height: 64,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(color: Colors.black.withAlpha(20), width: 1),
+              boxShadow: [BoxShadow(color: Colors.black.withAlpha(15), blurRadius: 10, offset: const Offset(0, -2))],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Expanded(
+                  child: _NavItem(
+                    iconName: 'home',
+                    iconOutlined: 'home_outlined',
+                    label: 'Notes',
+                    isActive: _selectedNavIndex == 0 && !_isCategoryView,
+                    onTap: () => setState(() { _selectedNavIndex = 0; _isCategoryView = false; }),
                   ),
-                  Expanded(
-                    child: _NavItem(
-                      iconName: 'star',
-                      iconOutlined: 'star_outline',
-                      label: 'Favorites',
-                      isActive: _selectedNavIndex == 1,
-                      onTap: () => setState(() {
-                        _selectedNavIndex = 1;
-                      }),
-                    ),
+                ),
+                Expanded(
+                  child: _NavItem(
+                    iconName: 'star',
+                    iconOutlined: 'star_outline',
+                    label: 'Favorites',
+                    isActive: _selectedNavIndex == 1,
+                    onTap: () => setState(() { _selectedNavIndex = 1; }),
                   ),
-                  const SizedBox(width: 68), // Space for floating circular add button
-                  Expanded(
-                    child: _NavItem(
-                      iconName: 'category',
-                      iconOutlined: 'category_outlined',
-                      label: 'Subjects',
-                      isActive: _isCategoryView,
-                      onTap: () => setState(() {
-                        _isCategoryView = true;
-                        _selectedNavIndex = 2;
-                      }),
-                    ),
+                ),
+                const SizedBox(width: 68), // Perfect docking spacing layout constraint
+                Expanded(
+                  child: _NavItem(
+                    iconName: 'category',
+                    iconOutlined: 'category_outlined',
+                    label: 'Subjects',
+                    isActive: _isCategoryView,
+                    onTap: () => setState(() { _isCategoryView = true; _selectedNavIndex = 2; }),
                   ),
-                  Expanded(
-                    child: _NavItem(
-                      iconName: 'add_circle',
-                      iconOutlined: 'add_circle_outline',
-                      label: 'Create',
-                      isActive: _selectedNavIndex == 3,
-                      onTap: _navigateToCreate,
-                    ),
+                ),
+                Expanded(
+                  child: _NavItem(
+                    iconName: 'add_circle',
+                    iconOutlined: 'add_circle_outline',
+                    label: 'Create',
+                    isActive: _selectedNavIndex == 3,
+                    onTap: _navigateToCreate,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -608,7 +427,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 class _SubjectSectionHeader extends StatelessWidget {
   final String subject;
   final int count;
-
   const _SubjectSectionHeader({required this.subject, required this.count});
 
   @override
@@ -618,35 +436,14 @@ class _SubjectSectionHeader extends StatelessWidget {
       padding: const EdgeInsets.only(top: 16, bottom: 6, left: 4),
       child: Row(
         children: [
-          Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
+          Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
           const SizedBox(width: 8),
-          Text(
-            subject,
-            style: GoogleFonts.manrope(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: color,
-            ),
-          ),
+          Text(subject, style: GoogleFonts.manrope(fontSize: 14, fontWeight: FontWeight.w700, color: color)),
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: color.withAlpha(38),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              '$count',
-              style: GoogleFonts.manrope(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: color,
-              ),
-            ),
+            decoration: BoxDecoration(color: color.withAlpha(38), borderRadius: BorderRadius.circular(10)),
+            child: Text('$count', style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w700, color: color)),
           ),
         ],
       ),
@@ -661,13 +458,7 @@ class _NavItem extends StatelessWidget {
   final bool isActive;
   final VoidCallback onTap;
 
-  const _NavItem({
-    required this.iconName,
-    required this.iconOutlined,
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-  });
+  const _NavItem({required this.iconName, required this.iconOutlined, required this.label, required this.isActive, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -682,17 +473,13 @@ class _NavItem extends StatelessWidget {
           children: [
             CustomIconWidget(
               iconName: isActive ? iconName : iconOutlined,
-              color: isActive ? theme.colorScheme.primary : theme.colorScheme.outline,
+              color: isActive ? theme.colorScheme.primary : Colors.black45,
               size: 22,
             ),
             const SizedBox(height: 2),
             Text(
               label,
-              style: GoogleFonts.manrope(
-                fontSize: 10,
-                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                color: isActive ? theme.colorScheme.primary : theme.colorScheme.outline,
-              ),
+              style: GoogleFonts.manrope(fontSize: 10, fontWeight: isActive ? FontWeight.w700 : FontWeight.w500, color: isActive ? theme.colorScheme.primary : Colors.black45),
             ),
           ],
         ),
@@ -706,13 +493,7 @@ class _AnimatedNoteCard extends StatefulWidget {
   final int index;
   final VoidCallback onTap;
   final VoidCallback onDelete;
-
-  const _AnimatedNoteCard({
-    required this.note,
-    required this.index,
-    required this.onTap,
-    required this.onDelete,
-  });
+  const _AnimatedNoteCard({required this.note, required this.index, required this.onTap, required this.onDelete});
 
   @override
   State<_AnimatedNoteCard> createState() => _AnimatedNoteCardState();
@@ -726,18 +507,9 @@ class _AnimatedNoteCardState extends State<_AnimatedNoteCard> with SingleTickerP
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 350 + (widget.index * 60).clamp(0, 400)),
-    );
-    _fadeAnim = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutCubic,
-    );
-    _slideAnim = Tween<Offset>(
-      begin: const Offset(0, 0.08),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+    _controller = AnimationController(vsync: this, duration: Duration(milliseconds: 350 + (widget.index * 60).clamp(0, 400)));
+    _fadeAnim = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    _slideAnim = Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
     _controller.forward();
   }
 
@@ -758,59 +530,25 @@ class _AnimatedNoteCardState extends State<_AnimatedNoteCard> with SingleTickerP
           direction: DismissDirection.endToStart,
           background: Container(
             margin: const EdgeInsets.symmetric(vertical: 6),
-            decoration: BoxDecoration(
-              color: AppTheme.error.withAlpha(38),
-              borderRadius: BorderRadius.circular(20),
-            ),
+            decoration: BoxDecoration(color: AppTheme.error.withAlpha(38), borderRadius: BorderRadius.circular(20)),
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 20),
-            child: const Icon(
-              Icons.delete_rounded,
-              color: AppTheme.error,
-              size: 24,
-            ),
+            child: const Icon(Icons.delete_rounded, color: AppTheme.error, size: 24),
           ),
           confirmDismiss: (_) async {
             return await showDialog<bool>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    backgroundColor: AppTheme.surfaceDark,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    title: Text(
-                      'Delete Note',
-                      style: GoogleFonts.manrope(
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                    content: Text(
-                      'This note will be permanently deleted.',
-                      style: GoogleFonts.manrope(color: Colors.white70),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx, false),
-                        child: Text(
-                          'Cancel',
-                          style: GoogleFonts.manrope(color: Colors.white54),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx, true),
-                        child: Text(
-                          'Delete',
-                          style: GoogleFonts.manrope(
-                            color: AppTheme.error,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ) ??
-                false;
+              context: context,
+              builder: (ctx) => AlertDialog(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                title: Text('Delete Note', style: GoogleFonts.manrope(fontWeight: FontWeight.w700, color: Colors.black)),
+                content: Text('This note will be permanently deleted.', style: GoogleFonts.manrope(color: Colors.black87)),
+                actions: [
+                  TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('Cancel', style: GoogleFonts.manrope(color: Colors.black54))),
+                  TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text('Delete', style: GoogleFonts.manrope(color: AppTheme.error, fontWeight: FontWeight.w600))),
+                ],
+              ),
+            ) ?? false;
           },
           onDismissed: (_) => widget.onDelete(),
           child: NoteCardWidget(note: widget.note, onTap: widget.onTap),
