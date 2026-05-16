@@ -288,7 +288,7 @@ class _NoteFormScreenState extends State<NoteFormScreen> with SingleTickerProvid
       height: 54,
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _isSaving ? null : _saveNote,
+        onPressed: _isSaving ? null : () => _saveNote(), // Force explicit trigger
         style: ElevatedButton.styleFrom(
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: Colors.white,
