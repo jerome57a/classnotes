@@ -1,8 +1,6 @@
+// lib/widgets/custom_error_widget.dart
 import 'package:flutter_svg/svg.dart';
-
 import '../core/app_export.dart';
-
-// custom_error_widget.dart
 
 class CustomErrorWidget extends StatelessWidget {
   final FlutterErrorDetails? errorDetails;
@@ -14,7 +12,7 @@ class CustomErrorWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: AppTheme.backgroundDark, // Match global dark surface requirement
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -31,23 +29,42 @@ class CustomErrorWidget extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   "Something went wrong",
-                  style: const TextStyle(
+                  style: GoogleFonts.manrope(
                     fontSize: 24,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF262626),
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 4),
-                SizedBox(
-                  child: const Text(
-                    'We encountered an unexpected error while processing your request.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFF525252), // neutral-600
+                const SizedBox(height: 8),
+                Text(
+                  errorMessage ?? 'We encountered an unexpected error while processing your request.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.manrope(
+                    fontSize: 14,
+                    color: Colors.white70,
+                  ),
+                ),
+                if (errorDetails != null) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceDark,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    maxHeight: 150,
+                    child: SingleChildScrollView(
+                      child: Text(
+                        errorDetails!.exceptionAsString(),
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 11,
+                          color: AppTheme.error,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   onPressed: () {
@@ -55,7 +72,11 @@ class CustomErrorWidget extends StatelessWidget {
                     if (canBeBack) {
                       Navigator.of(context).pop();
                     } else {
-                      Navigator.pushNamed(context, AppRoutes.initial);
+                      Navigator.pushNamedAndRemoveUntil(
+                        context, 
+                        AppRoutes.initial, 
+                        (route) => false,
+                      );
                     }
                   },
                   icon: const Icon(
@@ -63,16 +84,16 @@ class CustomErrorWidget extends StatelessWidget {
                     size: 18,
                     color: Colors.white,
                   ),
-                  label: const Text('Back'),
+                  label: const Text('Back to Safety'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.primaryColor,
+                    backgroundColor: AppTheme.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
+                      horizontal: 20,
+                      vertical: 12,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),

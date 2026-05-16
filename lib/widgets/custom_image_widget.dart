@@ -1,14 +1,15 @@
+// lib/widgets/custom_image_widget.dart
 import 'dart:io';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../core/app_export.dart';
 
 extension ImageTypeExtension on String {
   ImageType get imageType {
-    if (startsWith('http') || startsWith('https')) {
+    if (startsWith('http://') || startsWith('https://')) {
       return ImageType.network;
-    } else if (endsWith('.svg')) {
+    } else if (toLowerCase().endsWith('.svg')) {
       return ImageType.svg;
-    } else if (startsWith('file: //')) {
+    } else if (startsWith('file://') || startsWith('/')) { // Fixed space issue and added direct absolute root check
       return ImageType.file;
     } else {
       return ImageType.png;
@@ -18,9 +19,9 @@ extension ImageTypeExtension on String {
 
 enum ImageType { svg, png, network, file, unknown }
 
-// ignore_for_file: must_be_immutable
 class CustomImageWidget extends StatelessWidget {
-  const CustomImageWidget({super.key, 
+  const CustomImageWidget({
+    super.key, 
     this.imageUrl,
     this.height,
     this.width,
@@ -36,34 +37,18 @@ class CustomImageWidget extends StatelessWidget {
     this.semanticLabel,
   });
 
-  ///[imageUrl] is required parameter for showing image
   final String? imageUrl;
-
   final double? height;
-
   final double? width;
-
   final BoxFit? fit;
-
   final String placeHolder;
-
   final Color? color;
-
   final Alignment? alignment;
-
   final VoidCallback? onTap;
-
   final BorderRadius? radius;
-
   final EdgeInsetsGeometry? margin;
-
   final BoxBorder? border;
-
-  /// Optional widget to show when the image fails to load.
-  /// If null, a default asset image is shown.
   final Widget? errorWidget;
-
-  /// Semantic label for the image to improve accessibility
   final String? semanticLabel;
 
   @override
@@ -76,15 +61,18 @@ class CustomImageWidget extends StatelessWidget {
   Widget _buildWidget() {
     return Padding(
       padding: margin ?? EdgeInsets.zero,
-      child: InkWell(onTap: onTap, child: _buildCircleImage()),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        child: _buildCircleImage(),
+      ),
     );
   }
 
-  ///build the image with border radius
-  _buildCircleImage() {
+  Widget _buildCircleImage() {
     if (radius != null) {
       return ClipRRect(
-        borderRadius: radius ?? BorderRadius.zero,
+        borderRadius: radius!,
         child: _buildImageWithBorder(),
       );
     } else {
@@ -92,8 +80,7 @@ class CustomImageWidget extends StatelessWidget {
     }
   }
 
-  ///build the image with border and border radius style
-  _buildImageWithBorder() {
+  Widget _buildImageWithBorder() {
     if (border != null) {
       return Container(
         decoration: BoxDecoration(border: border, borderRadius: radius),
@@ -105,72 +92,87 @@ class CustomImageWidget extends StatelessWidget {
   }
 
   Widget _buildImageView() {
-    if (imageUrl != null) {
-      switch (imageUrl!.imageType) {
-        case ImageType.svg:
-          return SizedBox(
-            height: height,
-            width: width,
-            child: SvgPicture.asset(
-              imageUrl!,
-              height: height,
-              width: width,
-              fit: fit ?? BoxFit.contain,
-              colorFilter: color != null
-                  ? ColorFilter.mode(
-                      color ?? Colors.transparent,
-                      BlendMode.srcIn,
-                    )
-                  : null,
-              semanticsLabel: semanticLabel,
-            ),
-          );
-        case ImageType.file:
-          return Image.file(
-            File(imageUrl!),
-            height: height,
-            width: width,
-            fit: fit ?? BoxFit.cover,
-            color: color,
-            semanticLabel: semanticLabel,
-          );
-        case ImageType.network:
-          return CachedNetworkImage(
-            height: height,
-            width: width,
-            fit: fit,
-            imageUrl: imageUrl!,
-            color: color,
-            placeholder: (context, url) => SizedBox(
-              height: 30,
-              width: 30,
-              child: LinearProgressIndicator(
-                color: Colors.grey.shade200,
-                backgroundColor: Colors.grey.shade100,
-              ),
-            ),
-            errorWidget: (context, url, error) =>
-                errorWidget ??
-                Image.asset(
-                  placeHolder,
-                  height: height,
-                  width: width,
-                  fit: fit ?? BoxFit.cover,
-                  semanticLabel: semanticLabel,
-                ),
-          );
-        case ImageType.png:
-        default:
-          return Image.asset(
+    if (imageUrl == null || imageUrl!.trim().isEmpty) {
+      return Image.asset(
+        placeHolder,
+        height: height,
+        width: width,
+        fit: fit ?? BoxFit.cover,
+        semanticLabel: semanticLabel,
+      );
+    }
+
+    switch (imageUrl!.imageType) {
+      case ImageType.svg:
+        return SizedBox(
+          height: height,
+          width: width,
+          child: SvgPicture.asset(
             imageUrl!,
             height: height,
             width: width,
-            fit: fit ?? BoxFit.cover,
-            color: color,
-            semanticLabel: semanticLabel,
-          );
-      }
+            fit: fit ?? BoxFit.contain,
+            colorFilter: color != null
+                ? ColorFilter.mode(color!, BlendMode.srcIn)
+                : null,
+            semanticsLabel: semanticLabel,
+          ),
+        );
+      case ImageType.file:
+        final cleanPath = imageUrl!.replaceFirst('file://', '');
+        return Image.file(
+          File(cleanPath),
+          height: height,
+          width: width,
+          fit: fit ?? BoxFit.cover,
+          color: color,
+          semanticLabel: semanticLabel,
+          errorBuilder: (context, error, stackTrace) => _buildErrorFallback(),
+        );
+      case ImageType.network:
+        return CachedNetworkImage(
+          height: height,
+          width: width,
+          fit: fit,
+          imageUrl: imageUrl!,
+          color: color,
+          placeholder: (context, url) => SizedBox(
+            height: height ?? 30,
+            width: width ?? 30,
+            child: Center(
+              child: SizedBox(
+                height: 24,
+                width: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+          ),
+          errorWidget: (context, url, error) => _buildErrorFallback(),
+        );
+      case ImageType.png:
+      default:
+        return Image.asset(
+          imageUrl!,
+          height: height,
+          width: width,
+          fit: fit ?? BoxFit.cover,
+          color: color,
+          semanticLabel: semanticLabel,
+          errorBuilder: (context, error, stackTrace) => _buildErrorFallback(),
+        );
     }
-    return SizedBox();
+  }
+
+  Widget _buildErrorFallback() {
+    return errorWidget ?? Image.asset(
+      placeHolder,
+      height: height,
+      width: width,
+      fit: fit ?? BoxFit.cover,
+      semanticLabel: semanticLabel,
+    );
   }
 }

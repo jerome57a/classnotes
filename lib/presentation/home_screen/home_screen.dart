@@ -1,7 +1,5 @@
 import 'dart:ui';
-
 import 'package:flutter/services.dart';
-
 import '../../core/app_export.dart';
 import '../../data/database/database_helper.dart';
 import '../../data/models/note_model.dart';
@@ -18,8 +16,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   final DatabaseHelper _db = DatabaseHelper();
   List<NoteModel> _allNotes = [];
   List<NoteModel> _filteredNotes = [];
@@ -67,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen>
       _filteredNotes = List.from(_allNotes);
     } else {
       _filteredNotes = _allNotes
-          .where((n) => n.subject == _selectedSubject)
+          .where((n) => n.subject.toLowerCase() == _selectedSubject.toLowerCase())
           .toList();
     }
   }
@@ -137,9 +134,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void _navigateToSearch() {
-    setState(() => _selectedNavIndex = 1);
     Navigator.pushNamed(context, AppRoutes.searchScreen).then((_) {
-      if (mounted) setState(() => _selectedNavIndex = 0);
       _loadNotes();
     });
   }
@@ -181,7 +176,6 @@ class _HomeScreenState extends State<HomeScreen>
           children: [
             HomeAppBarWidget(noteCount: _allNotes.length),
             const SizedBox(height: 10),
-            // Search bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: GestureDetector(
@@ -189,9 +183,7 @@ class _HomeScreenState extends State<HomeScreen>
                 child: Container(
                   height: 46,
                   decoration: BoxDecoration(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.surfaceContainerHighest,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: Colors.white.withAlpha(20),
@@ -204,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen>
                       Icon(
                         Icons.search_rounded,
                         size: 20,
-                        color: Theme.of(context).colorScheme.outline,
+                        color: theme.colorScheme.outline,
                       ),
                       const SizedBox(width: 10),
                       Text(
@@ -212,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen>
                         style: GoogleFonts.manrope(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: Theme.of(context).colorScheme.outline,
+                          color: theme.colorScheme.outline,
                         ),
                       ),
                     ],
@@ -220,26 +212,24 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
-                      'Your Notes!',
+                      'Your Notes',
                       style: GoogleFonts.manrope(
-                        fontSize: 30,
+                        fontSize: 28,
                         fontWeight: FontWeight.w800,
                         color: theme.colorScheme.onSurface,
                         height: 1.2,
                       ),
                     ),
                   ),
-                  // View toggle button
                   GestureDetector(
-                    onTap: () =>
-                        setState(() => _isCategoryView = !_isCategoryView),
+                    onTap: () => setState(() => _isCategoryView = !_isCategoryView),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       curve: Curves.easeOutCubic,
@@ -263,13 +253,9 @@ class _HomeScreenState extends State<HomeScreen>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            _isCategoryView
-                                ? Icons.category_rounded
-                                : Icons.view_list_rounded,
+                            _isCategoryView ? Icons.category_rounded : Icons.view_list_rounded,
                             size: 16,
-                            color: _isCategoryView
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.outline,
+                            color: _isCategoryView ? theme.colorScheme.primary : theme.colorScheme.outline,
                           ),
                           const SizedBox(width: 5),
                           Text(
@@ -277,9 +263,7 @@ class _HomeScreenState extends State<HomeScreen>
                             style: GoogleFonts.manrope(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: _isCategoryView
-                                  ? theme.colorScheme.primary
-                                  : theme.colorScheme.outline,
+                              color: _isCategoryView ? theme.colorScheme.primary : theme.colorScheme.outline,
                             ),
                           ),
                         ],
@@ -295,43 +279,36 @@ class _HomeScreenState extends State<HomeScreen>
               selectedSubject: _selectedSubject,
               noteCounts: {
                 'All': _allNotes.length,
-                for (final s in _subjects)
-                  s: _allNotes.where((n) => n.subject == s).length,
+                for (final s in _subjects) s: _allNotes.where((n) => n.subject == s).length,
               },
               onSubjectSelected: _onSubjectSelected,
             ),
             const SizedBox(height: 8),
             Expanded(
               child: _isLoading
-                  ? const SizedBox.shrink()
+                  ? _buildSkeleton()
                   : _filteredNotes.isEmpty
-                  ? EmptyStateWidget(
-                      iconName: 'notes',
-                      title: 'No notes yet',
-                      subtitle: _selectedSubject == 'All'
-                          ? 'Tap the + button to capture your first class note.'
-                          : 'No notes found for $_selectedSubject.',
-                      ctaLabel: 'Create Note',
-                      onCta: _navigateToCreate,
-                    )
-                  : RefreshIndicator(
-                      onRefresh: _loadNotes,
-                      color: theme.colorScheme.primary,
-                      backgroundColor: AppTheme.surfaceDark,
-                      child: _isCategoryView
-                          ? (_isTablet
-                                ? _buildTabletCategoryGrid(
-                                    subjectGroups,
-                                    subjectGroupOrder,
-                                  )
-                                : _buildCategoryList(
-                                    subjectGroups,
-                                    subjectGroupOrder,
-                                  ))
-                          : (_isTablet
-                                ? _buildTabletGrid(dateGroups, dateGroupOrder)
-                                : _buildPhoneList(dateGroups, dateGroupOrder)),
-                    ),
+                      ? EmptyStateWidget(
+                          iconName: 'notes',
+                          title: 'No notes yet',
+                          subtitle: _selectedSubject == 'All'
+                              ? 'Tap the + button to capture your first class note.'
+                              : 'No notes found for $_selectedSubject.',
+                          ctaLabel: 'Create Note',
+                          onCta: _navigateToCreate,
+                        )
+                      : RefreshIndicator(
+                          onRefresh: _loadNotes,
+                          color: theme.colorScheme.primary,
+                          backgroundColor: AppTheme.surfaceDark,
+                          child: _isCategoryView
+                              ? (_isTablet
+                                  ? _buildTabletCategoryGrid(subjectGroups, subjectGroupOrder)
+                                  : _buildCategoryList(subjectGroups, subjectGroupOrder))
+                              : (_isTablet
+                                  ? _buildTabletGrid(dateGroups, dateGroupOrder)
+                                  : _buildPhoneList(dateGroups, dateGroupOrder)),
+                        ),
             ),
             QuickCaptureBarWidget(
               controller: _quickCaptureController,
@@ -354,11 +331,11 @@ class _HomeScreenState extends State<HomeScreen>
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
+              color: theme.colorScheme.primary,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withAlpha(115),
+                  color: theme.colorScheme.primary.withAlpha(115),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -372,16 +349,11 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildPhoneList(
-    Map<String, List<NoteModel>> groups,
-    List<String> order,
-  ) {
+  Widget _buildPhoneList(Map<String, List<NoteModel>> groups, List<String> order) {
     final items = <Widget>[];
     for (final group in order) {
-      if (!groups.containsKey(group)) continue;
-      items.add(
-        NoteSectionHeaderWidget(title: group, count: groups[group]!.length),
-      );
+      if (!groups.containsKey(group) || groups[group]!.isEmpty) continue;
+      items.add(NoteSectionHeaderWidget(title: group, count: groups[group]!.length));
       for (int i = 0; i < groups[group]!.length; i++) {
         final note = groups[group]![i];
         items.add(
@@ -390,8 +362,10 @@ class _HomeScreenState extends State<HomeScreen>
             index: i,
             onTap: () => _navigateToDetail(note),
             onDelete: () async {
-              await _db.deleteNote(note.id!);
-              _loadNotes();
+              if (note.id != null) {
+                await _db.deleteNote(note.id!);
+                _loadNotes();
+              }
             },
           ),
         );
@@ -404,16 +378,11 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildCategoryList(
-    Map<String, List<NoteModel>> groups,
-    List<String> order,
-  ) {
+  Widget _buildCategoryList(Map<String, List<NoteModel>> groups, List<String> order) {
     final items = <Widget>[];
     for (final subject in order) {
-      if (!groups.containsKey(subject)) continue;
-      items.add(
-        _SubjectSectionHeader(subject: subject, count: groups[subject]!.length),
-      );
+      if (!groups.containsKey(subject) || groups[subject]!.isEmpty) continue;
+      items.add(_SubjectSectionHeader(subject: subject, count: groups[subject]!.length));
       for (int i = 0; i < groups[subject]!.length; i++) {
         final note = groups[subject]![i];
         items.add(
@@ -422,8 +391,10 @@ class _HomeScreenState extends State<HomeScreen>
             index: i,
             onTap: () => _navigateToDetail(note),
             onDelete: () async {
-              await _db.deleteNote(note.id!);
-              _loadNotes();
+              if (note.id != null) {
+                await _db.deleteNote(note.id!);
+                _loadNotes();
+              }
             },
           ),
         );
@@ -436,20 +407,14 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildTabletGrid(
-    Map<String, List<NoteModel>> groups,
-    List<String> order,
-  ) {
+  Widget _buildTabletGrid(Map<String, List<NoteModel>> groups, List<String> order) {
     final items = <Widget>[];
     for (final group in order) {
-      if (!groups.containsKey(group)) continue;
+      if (!groups.containsKey(group) || groups[group]!.isEmpty) continue;
       items.add(
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8, top: 8),
-          child: NoteSectionHeaderWidget(
-            title: group,
-            count: groups[group]!.length,
-          ),
+          child: NoteSectionHeaderWidget(title: group, count: groups[group]!.length),
         ),
       );
       final notes = groups[group]!;
@@ -463,11 +428,14 @@ class _HomeScreenState extends State<HomeScreen>
                   index: i,
                   onTap: () => _navigateToDetail(notes[i]),
                   onDelete: () async {
-                    await _db.deleteNote(notes[i].id!);
-                    _loadNotes();
+                    if (notes[i].id != null) {
+                      await _db.deleteNote(notes[i].id!);
+                      _loadNotes();
+                    }
                   },
                 ),
               ),
+              const SizedBox(width: 12),
               if (i + 1 < notes.length)
                 Expanded(
                   child: _AnimatedNoteCard(
@@ -475,8 +443,10 @@ class _HomeScreenState extends State<HomeScreen>
                     index: i + 1,
                     onTap: () => _navigateToDetail(notes[i + 1]),
                     onDelete: () async {
-                      await _db.deleteNote(notes[i + 1].id!);
-                      _loadNotes();
+                      if (notes[i + 1].id != null) {
+                        await _db.deleteNote(notes[i + 1].id!);
+                        _loadNotes();
+                      }
                     },
                   ),
                 )
@@ -494,20 +464,14 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildTabletCategoryGrid(
-    Map<String, List<NoteModel>> groups,
-    List<String> order,
-  ) {
+  Widget _buildTabletCategoryGrid(Map<String, List<NoteModel>> groups, List<String> order) {
     final items = <Widget>[];
     for (final subject in order) {
-      if (!groups.containsKey(subject)) continue;
+      if (!groups.containsKey(subject) || groups[subject]!.isEmpty) continue;
       items.add(
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8, top: 8),
-          child: _SubjectSectionHeader(
-            subject: subject,
-            count: groups[subject]!.length,
-          ),
+          child: _SubjectSectionHeader(subject: subject, count: groups[subject]!.length),
         ),
       );
       final notes = groups[subject]!;
@@ -521,11 +485,14 @@ class _HomeScreenState extends State<HomeScreen>
                   index: i,
                   onTap: () => _navigateToDetail(notes[i]),
                   onDelete: () async {
-                    await _db.deleteNote(notes[i].id!);
-                    _loadNotes();
+                    if (notes[i].id != null) {
+                      await _db.deleteNote(notes[i].id!);
+                      _loadNotes();
+                    }
                   },
                 ),
               ),
+              const SizedBox(width: 12),
               if (i + 1 < notes.length)
                 Expanded(
                   child: _AnimatedNoteCard(
@@ -533,8 +500,10 @@ class _HomeScreenState extends State<HomeScreen>
                     index: i + 1,
                     onTap: () => _navigateToDetail(notes[i + 1]),
                     onDelete: () async {
-                      await _db.deleteNote(notes[i + 1].id!);
-                      _loadNotes();
+                      if (notes[i + 1].id != null) {
+                        await _db.deleteNote(notes[i + 1].id!);
+                        _loadNotes();
+                      }
                     },
                   ),
                 )
@@ -561,56 +530,71 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildLiquidGlassNav(ThemeData theme) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(32),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            height: 64,
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceVariantDark.withAlpha(191),
-              borderRadius: BorderRadius.circular(32),
-              border: Border.all(color: Colors.white.withAlpha(26), width: 1),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _NavItem(
-                  iconName: 'home',
-                  iconOutlined: 'home_outlined',
-                  label: 'Notes',
-                  isActive: _selectedNavIndex == 0,
-                  onTap: () => setState(() => _selectedNavIndex = 0),
-                ),
-                _NavItem(
-                  iconName: 'search',
-                  iconOutlined: 'search',
-                  label: 'Search',
-                  isActive: _selectedNavIndex == 1,
-                  onTap: _navigateToSearch,
-                ),
-                const SizedBox(width: 60), // FAB space
-                _NavItem(
-                  iconName: 'category',
-                  iconOutlined: 'category_outlined',
-                  label: 'By Subject',
-                  isActive: _isCategoryView,
-                  onTap: () =>
-                      setState(() => _isCategoryView = !_isCategoryView),
-                ),
-                _NavItem(
-                  iconName: 'add_circle',
-                  iconOutlined: 'add_circle_outline',
-                  label: 'Add Note',
-                  isActive: _selectedNavIndex == 3,
-                  onTap: () {
-                    setState(() => _selectedNavIndex = 3);
-                    _navigateToCreate();
-                  },
-                ),
-              ],
+    return SizedBox(
+      height: 88,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(32),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(
+              height: 64,
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceVariantDark.withAlpha(191),
+                borderRadius: BorderRadius.circular(32),
+                border: Border.all(color: Colors.white.withAlpha(26), width: 1),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Expanded(
+                    child: _NavItem(
+                      iconName: 'home',
+                      iconOutlined: 'home_outlined',
+                      label: 'Notes',
+                      isActive: _selectedNavIndex == 0 && !_isCategoryView,
+                      onTap: () => setState(() {
+                        _selectedNavIndex = 0;
+                        _isCategoryView = false;
+                      }),
+                    ),
+                  ),
+                  Expanded(
+                    child: _NavItem(
+                      iconName: 'star',
+                      iconOutlined: 'star_outline',
+                      label: 'Favorites',
+                      isActive: _selectedNavIndex == 1,
+                      onTap: () => setState(() {
+                        _selectedNavIndex = 1;
+                      }),
+                    ),
+                  ),
+                  const SizedBox(width: 68),
+                  Expanded(
+                    child: _NavItem(
+                      iconName: 'category',
+                      iconOutlined: 'category_outlined',
+                      label: 'Subjects',
+                      isActive: _isCategoryView,
+                      onTap: () => setState(() {
+                        _isCategoryView = true;
+                        _selectedNavIndex = 2;
+                      }),
+                    ),
+                  ),
+                  Expanded(
+                    child: _NavItem(
+                      iconName: 'add_circle',
+                      iconOutlined: 'add_circle_outline',
+                      label: 'Create',
+                      isActive: _selectedNavIndex == 3,
+                      onTap: _navigateToCreate,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -625,27 +609,9 @@ class _SubjectSectionHeader extends StatelessWidget {
 
   const _SubjectSectionHeader({required this.subject, required this.count});
 
-  Color _subjectColor(String subject) {
-    final colors = {
-      'Mathematics': const Color(0xFF7C6AFA),
-      'Physics': const Color(0xFF38BDF8),
-      'Chemistry': const Color(0xFF22C55E),
-      'Biology': const Color(0xFFF59E0B),
-      'History': const Color(0xFFF97316),
-      'Computer Science': const Color(0xFF06B6D4),
-      'Literature': const Color(0xFFEC4899),
-      'Economics': const Color(0xFF94A3B8),
-      'Geography': const Color(0xFF10B981),
-      'Philosophy': const Color(0xFFA78BFA),
-      'General': const Color(0xFF64748B),
-    };
-    return colors[subject] ?? const Color(0xFF7C6AFA);
-  }
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color = _subjectColor(subject);
+    final color = AppTheme.subjectColor(subject);
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 6, left: 4),
       child: Row(
@@ -707,24 +673,14 @@ class _NavItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: isActive
-            ? BoxDecoration(
-                color: theme.colorScheme.primary.withAlpha(46),
-                borderRadius: BorderRadius.circular(20),
-              )
-            : null,
+      child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CustomIconWidget(
               iconName: isActive ? iconName : iconOutlined,
-              color: isActive
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.outline,
+              color: isActive ? theme.colorScheme.primary : theme.colorScheme.outline,
               size: 22,
             ),
             const SizedBox(height: 2),
@@ -733,9 +689,7 @@ class _NavItem extends StatelessWidget {
               style: GoogleFonts.manrope(
                 fontSize: 10,
                 fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                color: isActive
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.outline,
+                color: isActive ? theme.colorScheme.primary : theme.colorScheme.outline,
               ),
             ),
           ],
@@ -762,8 +716,7 @@ class _AnimatedNoteCard extends StatefulWidget {
   State<_AnimatedNoteCard> createState() => _AnimatedNoteCardState();
 }
 
-class _AnimatedNoteCardState extends State<_AnimatedNoteCard>
-    with SingleTickerProviderStateMixin {
+class _AnimatedNoteCardState extends State<_AnimatedNoteCard> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnim;
   late Animation<Offset> _slideAnim;

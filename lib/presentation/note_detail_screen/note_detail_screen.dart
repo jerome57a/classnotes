@@ -1,7 +1,6 @@
-
+// lib/presentation/note_detail_screen/note_detail_screen.dart
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import '../../core/app_export.dart';
 import '../../data/database/database_helper.dart';
 import '../../data/models/note_model.dart';
@@ -18,9 +17,7 @@ class NoteDetailScreen extends StatefulWidget {
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
 }
 
-class _NoteDetailScreenState extends State<NoteDetailScreen>
-    with SingleTickerProviderStateMixin {
-  // TODO: Replace with Riverpod/Bloc for production
+class _NoteDetailScreenState extends State<NoteDetailScreen> with SingleTickerProviderStateMixin {
   final DatabaseHelper _db = DatabaseHelper();
   NoteModel? _note;
   List<NoteModel> _relatedNotes = [];
@@ -50,22 +47,25 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
         curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
       ),
     );
-    _contentSlide =
-        Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _entranceController,
-            curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
-          ),
-        );
+    _contentSlide = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(
+      CurvedAnimation(
+        parent: _entranceController,
+        curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
+      ),
+    );
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
-    if (args is NoteModel && _note == null) {
-      _note = args;
-      _loadRelatedNotes();
+    if (args is NoteModel) {
+      // Allow dynamic swapping even if route replaces context entries directly
+      if (_note == null || _note!.id != args.id) {
+        _note = args;
+        _isLoading = true;
+        _loadRelatedNotes();
+      }
     }
   }
 
@@ -77,21 +77,21 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
 
   Future<void> _loadRelatedNotes() async {
     if (_note == null) return;
-    // TODO: Replace with repository layer for production
     final all = await _db.getAllNotes();
     if (mounted) {
       setState(() {
         _relatedNotes = all
-            .where((n) => n.subject == _note!.subject && n.id != _note!.id)
+            .where((n) => n.subject.toLowerCase() == _note!.subject.toLowerCase() && n.id != _note!.id)
             .take(3)
             .toList();
         _isLoading = false;
       });
-      _entranceController.forward();
+      _entranceController.forward(from: 0.0);
     }
   }
 
   void _navigateToEdit() {
+    if (_note == null) return;
     Navigator.pushNamed(
       context,
       AppRoutes.noteFormScreen,
@@ -100,13 +100,17 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
       if (_note?.id != null) {
         final updated = await _db.getNoteById(_note!.id!);
         if (updated != null && mounted) {
-          setState(() => _note = updated);
+          setState(() {
+            _note = updated;
+          });
+          _loadRelatedNotes();
         }
       }
     });
   }
 
   Future<void> _deleteNote() async {
+    if (_note == null || _note!.id == null) return;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -114,10 +118,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'Delete Note',
-          style: GoogleFonts.manrope(
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
+          style: GoogleFonts.manrope(fontWeight: FontWeight.w700, color: Colors.white),
         ),
         content: Text(
           'Are you sure you want to delete "${_note?.title}"? This cannot be undone.',
@@ -126,26 +127,19 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(
-              'Cancel',
-              style: GoogleFonts.manrope(color: Colors.white54),
-            ),
+            child: Text('Cancel', style: GoogleFonts.manrope(color: Colors.white54)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: Text(
               'Delete',
-              style: GoogleFonts.manrope(
-                color: AppTheme.error,
-                fontWeight: FontWeight.w700,
-              ),
+              style: GoogleFonts.manrope(color: AppTheme.error, fontWeight: FontWeight.w700),
             ),
           ),
         ],
       ),
     );
-    if (confirmed == true && _note?.id != null) {
-      // TODO: Replace with repository layer for production
+    if (confirmed == true && mounted) {
       await _db.deleteNote(_note!.id!);
       HapticFeedback.mediumImpact();
       Fluttertoast.showToast(
@@ -153,14 +147,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
         backgroundColor: AppTheme.surfaceVariantDark,
         textColor: Colors.white,
       );
-      if (mounted) Navigator.pop(context);
+      Navigator.pop(context);
     }
   }
 
   void _shareNote() {
     if (_note == null) return;
     final text = '${_note!.title}\n${_note!.subject}\n\n${_note!.content}';
-    // TODO: Integrate share_plus for production sharing
     Clipboard.setData(ClipboardData(text: text));
     Fluttertoast.showToast(
       msg: 'Note copied to clipboard',
@@ -182,7 +175,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
   @override
   Widget build(BuildContext context) {
     if (_note == null) {
-      return Scaffold(
+      return const Scaffold(
         backgroundColor: AppTheme.backgroundDark,
         body: Center(child: CircularProgressIndicator(color: AppTheme.primary)),
       );
@@ -201,14 +194,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
         accentColor: _accentColor,
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppTheme.primary),
-            )
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.primary))
           : SafeArea(
               child: isTablet
-                  ? Center(
-                      child: SizedBox(width: 680, child: _buildBody(theme)),
-                    )
+                  ? Center(child: SizedBox(width: 680, child: _buildBody(theme)))
                   : _buildBody(theme),
             ),
     );
@@ -250,34 +239,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen>
               child: RelatedNotesWidget(
                 notes: _relatedNotes,
                 onNoteTap: (note) {
-                  Navigator.pushReplacement(
+                  Navigator.pushReplacementNamed(
                     context,
-                    PageRouteBuilder(
-                      settings: RouteSettings(
-                        name: AppRoutes.noteDetailScreen,
-                        arguments: note,
-                      ),
-                      transitionDuration: const Duration(milliseconds: 280),
-                      pageBuilder: (_, __, ___) => const NoteDetailScreen(),
-                      transitionsBuilder: (_, animation, __, child) {
-                        return SlideTransition(
-                          position:
-                              Tween<Offset>(
-                                begin: const Offset(0.04, 0),
-                                end: Offset.zero,
-                              ).animate(
-                                CurvedAnimation(
-                                  parent: animation,
-                                  curve: Curves.easeOutCubic,
-                                ),
-                              ),
-                          child: FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          ),
-                        );
-                      },
-                    ),
+                    AppRoutes.noteDetailScreen,
+                    arguments: note,
                   );
                 },
               ),
