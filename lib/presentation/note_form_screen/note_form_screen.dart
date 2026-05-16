@@ -1,7 +1,6 @@
 // lib/presentation/note_form_screen/note_form_screen.dart
 import 'dart:ui';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import '../../core/app_export.dart';
 import '../../data/database/database_helper.dart';
 import '../../data/models/note_model.dart';
@@ -106,7 +105,16 @@ class _NoteFormScreenState extends State<NoteFormScreen> with SingleTickerProvid
   }
 
   Future<void> _saveNote() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please provide a Title for your note'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    
     setState(() => _isSaving = true);
     HapticFeedback.mediumImpact();
 
@@ -120,11 +128,11 @@ class _NoteFormScreenState extends State<NoteFormScreen> with SingleTickerProvid
           updatedAt: DateTime.now(),
         );
         await _db.updateNote(updated);
-        Fluttertoast.showToast(
-          msg: 'Note updated!',
-          backgroundColor: AppTheme.success,
-          textColor: Colors.white,
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Note updated!'), backgroundColor: Colors.green),
+          );
+        }
       } else {
         final note = NoteModel(
           title: _titleController.text.trim(),
@@ -135,19 +143,20 @@ class _NoteFormScreenState extends State<NoteFormScreen> with SingleTickerProvid
           updatedAt: DateTime.now(),
         );
         await _db.insertNote(note);
-        Fluttertoast.showToast(
-          msg: 'Note saved!',
-          backgroundColor: AppTheme.success,
-          textColor: Colors.white,
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Note saved!'), backgroundColor: Colors.green),
+          );
+        }
       }
       if (mounted) Navigator.pop(context);
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: 'Couldn\'t save note. Please try again.',
-        backgroundColor: AppTheme.error,
-        textColor: Colors.white,
-      );
+      debugPrint('Save Error: $e'); 
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Database Error: $e'), backgroundColor: Colors.red),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -232,7 +241,7 @@ class _NoteFormScreenState extends State<NoteFormScreen> with SingleTickerProvid
     );
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: Colors.white,
       appBar: _buildFormAppBar(theme),
       body: SafeArea(
         child: _isTablet ? Center(child: SizedBox(width: 560, child: content)) : content,
@@ -247,7 +256,7 @@ class _NoteFormScreenState extends State<NoteFormScreen> with SingleTickerProvid
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
           child: AppBar(
-            backgroundColor: AppTheme.backgroundDark.withAlpha(191),
+            backgroundColor: Colors.white.withAlpha(240),
             elevation: 0,
             leading: GestureDetector(
               onTap: () => Navigator.pop(context),
@@ -257,7 +266,7 @@ class _NoteFormScreenState extends State<NoteFormScreen> with SingleTickerProvid
                   color: theme.colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 18),
+                child: const Icon(Icons.arrow_back_rounded, color: Colors.black87, size: 18),
               ),
             ),
             title: Text(
@@ -265,7 +274,7 @@ class _NoteFormScreenState extends State<NoteFormScreen> with SingleTickerProvid
               style: GoogleFonts.manrope(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: theme.colorScheme.onSurface,
+                color: Colors.black87,
               ),
             ),
           ),
@@ -275,33 +284,29 @@ class _NoteFormScreenState extends State<NoteFormScreen> with SingleTickerProvid
   }
 
   Widget _buildSaveButton(ThemeData theme) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
+    return SizedBox(
       height: 54,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [theme.colorScheme.primary, theme.colorScheme.secondary],
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: _isSaving ? null : _saveNote,
-          borderRadius: BorderRadius.circular(16),
-          child: Center(
-            child: _isSaving
-                ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
-                  )
-                : Text(
-                    _isEditMode ? 'Update Note' : 'Save Note',
-                    style: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
-                  ),
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _isSaving ? null : _saveNote,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
+          elevation: 4,
         ),
+        child: _isSaving
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+              )
+            : Text(
+                _isEditMode ? 'Update Note' : 'Save Note',
+                style: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w700),
+              ),
       ),
     );
   }
@@ -309,21 +314,21 @@ class _NoteFormScreenState extends State<NoteFormScreen> with SingleTickerProvid
   Widget _buildSearchScreen() {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppTheme.backgroundDark,
+        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
         title: TextField(
           controller: _searchController,
           autofocus: true,
-          style: GoogleFonts.manrope(color: Colors.white, fontSize: 14),
+          style: GoogleFonts.manrope(color: Colors.black87, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'Search workspace...',
-            hintStyle: TextStyle(color: theme.colorScheme.outline),
+            hintStyle: TextStyle(color: Colors.black45), 
             border: InputBorder.none,
             filled: false,
           ),
@@ -331,18 +336,18 @@ class _NoteFormScreenState extends State<NoteFormScreen> with SingleTickerProvid
         ),
       ),
       body: _searchController.text.isEmpty
-          ? const Center(child: Text('Type to find notes', style: TextStyle(color: Colors.white54)))
+          ? const Center(child: Text('Type to find notes', style: TextStyle(color: Colors.black54))) 
           : _isSearching
               ? const Center(child: CircularProgressIndicator())
               : _searchResults.isEmpty
-                  ? const Center(child: Text('No matches found', style: TextStyle(color: Colors.white54)))
+                  ? const Center(child: Text('No matches found', style: TextStyle(color: Colors.black54))) 
                   : ListView.builder(
                       padding: const EdgeInsets.all(16),
                       itemCount: _searchResults.length,
                       itemBuilder: (_, i) {
                         final note = _searchResults[i];
                         return ListTile(
-                          title: Text(note.title, style: const TextStyle(color: Colors.white)),
+                          title: Text(note.title, style: const TextStyle(color: Colors.black87)), 
                           subtitle: Text(note.subject, style: TextStyle(color: AppTheme.subjectColor(note.subject))),
                           onTap: () {
                             Navigator.pushNamed(context, AppRoutes.noteDetailScreen, arguments: note);

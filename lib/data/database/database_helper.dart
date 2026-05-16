@@ -17,7 +17,7 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'classnotes.db');
+    final path = join(dbPath, 'classnotes_v2.db');
     return openDatabase(path, version: 1, onCreate: _onCreate);
   }
 
@@ -34,8 +34,6 @@ class DatabaseHelper {
       )
     ''');
   }
-
-  // TODO: Replace with repository pattern + error handling for production
 
   Future<int> insertNote(NoteModel note) async {
     final db = await database;
