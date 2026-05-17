@@ -1,168 +1,70 @@
-import 'dart:ui';
-
-
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/app_export.dart';
+import '../../../data/database/database_helper.dart';
 import '../../../data/models/note_model.dart';
 
-class DetailAppBarWidget extends StatelessWidget
-    implements PreferredSizeWidget {
+class DetailAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final NoteModel note;
-  final VoidCallback onBack;
-  final VoidCallback onShare;
-  final Color accentColor;
 
-  const DetailAppBarWidget({
-    super.key,
-    required this.note,
-    required this.onBack,
-    required this.onShare,
-    required this.accentColor,
-  });
+  const DetailAppBarWidget({super.key, required this.note});
 
   @override
   Size get preferredSize => const Size.fromHeight(60);
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          height: 60 + MediaQuery.of(context).padding.top,
-          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-          decoration: BoxDecoration(
-            color: AppTheme.backgroundDark.withAlpha(184),
-            border: Border(
-              bottom: BorderSide(color: Colors.white.withAlpha(18), width: 1),
-            ),
-          ),
-          child: Row(
-            children: [
-              // Back button
-              GestureDetector(
-                onTap: onBack,
-                child: Container(
-                  margin: const EdgeInsets.only(left: 16),
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: CustomIconWidget(
-                      iconName: 'arrow_back',
-                      color: theme.colorScheme.onSurface,
-                      size: 18,
-                    ),
-                  ),
-                ),
-              ),
-              // Title
-              Expanded(
-                child: Center(
-                  child: Text(
-                    'Note Detail',
-                    style: GoogleFonts.manrope(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                ),
-              ),
-              // Overlapping avatars + share
-              Row(
-                children: [
-                  // Two overlapping small avatars (decorative collaborators)
-                  SizedBox(
-                    width: 52,
-                    height: 28,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          left: 0,
-                          child: Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppTheme.backgroundDark,
-                                width: 2,
-                              ),
-                            ),
-                            child: ClipOval(
-                              child: CustomImageWidget(
-                                imageUrl:
-                                    'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=60',
-                                width: 28,
-                                height: 28,
-                                fit: BoxFit.cover,
-                                semanticLabel:
-                                    'Student collaborator profile photo',
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 18,
-                          child: Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppTheme.backgroundDark,
-                                width: 2,
-                              ),
-                            ),
-                            child: ClipOval(
-                              child: CustomImageWidget(
-                                imageUrl:
-                                    'https://images.pixabay.com/photo/2016/11/21/12/42/beard-1845166_640.jpg',
-                                width: 28,
-                                height: 28,
-                                fit: BoxFit.cover,
-                                semanticLabel:
-                                    'Second student collaborator profile photo',
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: onShare,
-                    child: Container(
-                      width: 38,
-                      height: 38,
-                      margin: const EdgeInsets.only(right: 16),
-                      decoration: BoxDecoration(
-                        color: accentColor.withAlpha(38),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: accentColor.withAlpha(77),
-                          width: 1,
-                        ),
-                      ),
-                      child: Center(
-                        child: CustomIconWidget(
-                          iconName: 'share',
-                          color: accentColor,
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_rounded, color: Colors.black87),
+        onPressed: () => Navigator.pop(context),
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.edit_rounded, color: Colors.black87),
+          onPressed: () {
+            Navigator.pushNamed(context, AppRoutes.noteFormScreen, arguments: note).then((_) {
+              Navigator.pop(context); 
+            });
+          },
         ),
+        IconButton(
+          icon: const Icon(Icons.delete_outline_rounded, color: AppTheme.error),
+          onPressed: () => _confirmDelete(context),
+        ),
+        const SizedBox(width: 8),
+      ],
+    );
+  }
+
+  void _confirmDelete(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('Delete Note', style: GoogleFonts.manrope(fontWeight: FontWeight.w700, color: Colors.black87)),
+        content: Text('Are you sure you want to permanently delete this note?', style: GoogleFonts.manrope(color: Colors.black87)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Cancel', style: GoogleFonts.manrope(color: Colors.black54)),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (note.id != null) {
+                await DatabaseHelper().deleteNote(note.id!);
+              }
+              if (context.mounted) {
+                Navigator.pop(ctx);
+                Navigator.pop(context);
+              }
+            },
+            child: Text('Delete', style: GoogleFonts.manrope(color: AppTheme.error, fontWeight: FontWeight.w700)),
+          ),
+        ],
       ),
     );
   }

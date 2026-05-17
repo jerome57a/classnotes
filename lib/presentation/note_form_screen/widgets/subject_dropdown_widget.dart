@@ -1,7 +1,7 @@
-import 'dart:ui';
-
-
-import '../../../core/app_export.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../theme/app_theme.dart';
+import '../../../widgets/custom_icon_widget.dart';
 
 class SubjectDropdownWidget extends StatelessWidget {
   final List<String> subjects;
@@ -17,115 +17,63 @@ class SubjectDropdownWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final accent = AppTheme.subjectColor(selectedSubject);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 6),
-          child: Row(
-            children: [
-              CustomIconWidget(
-                iconName: 'label',
-                color: theme.colorScheme.outline,
-                size: 14,
+        Row(
+          children: [
+            const CustomIconWidget(iconName: 'category', color: Colors.black54, size: 16),
+            const SizedBox(width: 8),
+            Text(
+              'Subject',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
               ),
-              const SizedBox(width: 6),
-              Text(
-                'Subject',
-                style: GoogleFonts.manrope(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.outline,
-                  letterSpacing: 0.2,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceVariantDark.withAlpha(153),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withAlpha(20), width: 1),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: selectedSubject,
-                  isExpanded: true,
-                  dropdownColor: AppTheme.surfaceDark,
-                  borderRadius: BorderRadius.circular(16),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 4,
-                  ),
-                  icon: CustomIconWidget(
-                    iconName: 'arrow_drop_down',
-                    color: theme.colorScheme.outline,
-                    size: 24,
-                  ),
-                  selectedItemBuilder: (context) => subjects
-                      .map(
-                        (s) => Row(
-                          children: [
-                            Container(
-                              width: 10,
-                              height: 10,
-                              decoration: BoxDecoration(
-                                color: AppTheme.subjectColor(s),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              s,
-                              style: GoogleFonts.manrope(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
-                          ],
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF1F5F9),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: selectedSubject,
+              isExpanded: true,
+              dropdownColor: Colors.white,
+              icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.black54),
+              items: subjects.map((s) {
+                return DropdownMenuItem(
+                  value: s,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: AppTheme.subjectColor(s),
+                          shape: BoxShape.circle,
                         ),
-                      )
-                      .toList(),
-                  items: subjects
-                      .map(
-                        (s) => DropdownMenuItem<String>(
-                          value: s,
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  color: AppTheme.subjectColor(s),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                s,
-                                style: GoogleFonts.manrope(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: theme.colorScheme.onSurface,
-                                ),
-                              ),
-                            ],
-                          ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        s,
+                        style: GoogleFonts.manrope(
+                          color: Colors.black87,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
                         ),
-                      )
-                      .toList(),
-                  onChanged: onChanged,
-                ),
-              ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: onChanged,
             ),
           ),
         ),

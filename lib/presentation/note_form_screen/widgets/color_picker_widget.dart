@@ -1,5 +1,6 @@
-
-import '../../../core/app_export.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../widgets/custom_icon_widget.dart';
 
 class ColorPickerWidget extends StatelessWidget {
   final List<String> colorOptions;
@@ -15,74 +16,45 @@ class ColorPickerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 12),
-          child: Row(
-            children: [
-              CustomIconWidget(
-                iconName: 'palette',
-                color: theme.colorScheme.outline,
-                size: 14,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                'Accent Color',
-                style: GoogleFonts.manrope(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.outline,
-                  letterSpacing: 0.2,
-                ),
-              ),
-            ],
-          ),
-        ),
         Row(
+          children: [
+            const CustomIconWidget(iconName: 'palette', color: Colors.black54, size: 16),
+            const SizedBox(width: 8),
+            Text(
+              'Theme Color',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
           children: colorOptions.map((hex) {
-            Color color;
-            try {
-              color = Color(
-                int.parse('FF${hex.replaceFirst('#', '')}', radix: 16),
-              );
-            } catch (_) {
-              color = AppTheme.primary;
-            }
+            final color = Color(int.parse('FF${hex.replaceFirst('#', '')}', radix: 16));
             final isSelected = hex == selectedColor;
             return GestureDetector(
               onTap: () => onColorSelected(hex),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOutCubic,
-                margin: const EdgeInsets.only(right: 12),
-                width: isSelected ? 38 : 32,
-                height: isSelected ? 38 : 32,
+                width: 36,
+                height: 36,
                 decoration: BoxDecoration(
                   color: color,
                   shape: BoxShape.circle,
-                  border: isSelected
-                      ? Border.all(color: Colors.white, width: 2.5)
-                      : null,
+                  border: isSelected ? Border.all(color: Colors.black87, width: 2) : null,
                   boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: color.withAlpha(128),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ]
+                      ? [BoxShadow(color: color.withAlpha(102), blurRadius: 8, offset: const Offset(0, 4))]
                       : null,
                 ),
-                child: isSelected
-                    ? const Icon(
-                        Icons.check_rounded,
-                        color: Colors.white,
-                        size: 16,
-                      )
-                    : null,
+                child: isSelected ? const Icon(Icons.check_rounded, color: Colors.white, size: 18) : null,
               ),
             );
           }).toList(),
