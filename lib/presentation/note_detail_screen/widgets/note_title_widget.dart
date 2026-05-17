@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/app_export.dart';
 import '../../../data/models/note_model.dart';
-import '../../../widgets/status_badge_widget.dart';
 
 class NoteTitleWidget extends StatelessWidget {
   final NoteModel note;

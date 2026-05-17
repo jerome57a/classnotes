@@ -1,4 +1,3 @@
-
 import '../../../core/app_export.dart';
 
 class NoteInlineToolbarWidget extends StatelessWidget {
@@ -23,28 +22,26 @@ class NoteInlineToolbarWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Section divider
+          // Section divider (Updated to dark color for visibility)
           Container(
             height: 1,
-            color: Colors.white.withAlpha(15),
+            color: Colors.black.withAlpha(15), 
             margin: const EdgeInsets.only(bottom: 20),
           ),
-          // Inline toolbar — anatomy locked from Image 1 Screen 1.2
-          // Large white circle FAB ("+") + 3 icon buttons in rounded containers
           Row(
             children: [
-              // Large circle "+" button
+              // Large circle edit button (Changed to primary color)
               GestureDetector(
                 onTap: onEdit,
                 child: Container(
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: theme.colorScheme.primary, 
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.white.withAlpha(51),
+                        color: theme.colorScheme.primary.withAlpha(51),
                         blurRadius: 16,
                         offset: const Offset(0, 4),
                       ),
@@ -52,7 +49,7 @@ class NoteInlineToolbarWidget extends StatelessWidget {
                   ),
                   child: const Icon(
                     Icons.edit_rounded,
-                    color: AppTheme.backgroundDark,
+                    color: Colors.white, 
                     size: 24,
                   ),
                 ),
@@ -61,7 +58,7 @@ class NoteInlineToolbarWidget extends StatelessWidget {
               // Camera/attach icon button
               _ToolbarIconButton(
                 iconName: 'attach_file',
-                color: theme.colorScheme.outline,
+                color: Colors.black54, 
                 onTap: () {},
               ),
               const SizedBox(width: 10),
@@ -84,19 +81,18 @@ class NoteInlineToolbarWidget extends StatelessWidget {
               // Copy to clipboard
               _ToolbarIconButton(
                 iconName: 'content_copy',
-                color: theme.colorScheme.outline,
+                color: Colors.black54, 
                 onTap: () {},
               ),
             ],
           ),
           const SizedBox(height: 24),
-          // Sub-section label — anatomy from Image 1 Screen 1.2
           Text(
             'Quick Actions',
             style: GoogleFonts.manrope(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: theme.colorScheme.onSurface,
+              color: Colors.black87, 
             ),
           ),
           const SizedBox(height: 14),
@@ -146,16 +142,15 @@ class _ToolbarIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 46,
         height: 46,
         decoration: BoxDecoration(
-          color: backgroundColor ?? theme.colorScheme.surfaceContainerHighest,
+          color: backgroundColor ?? Colors.white, 
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.white.withAlpha(18), width: 1),
+          border: Border.all(color: Colors.black.withAlpha(15), width: 1), 
         ),
         child: Center(
           child: CustomIconWidget(iconName: iconName, color: color, size: 20),

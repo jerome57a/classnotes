@@ -1,4 +1,3 @@
-
 import '../../../core/app_export.dart';
 import '../../../data/models/note_model.dart';
 
@@ -23,18 +22,8 @@ class RelatedNotesWidget extends StatelessWidget {
 
   String _shortDate(DateTime dt) {
     const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
     return '${months[dt.month - 1]} ${dt.day}';
   }
@@ -47,9 +36,10 @@ class RelatedNotesWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Section Divider
           Container(
             height: 1,
-            color: Colors.white.withAlpha(15),
+            color: Colors.black.withAlpha(15), 
             margin: const EdgeInsets.only(bottom: 20),
           ),
           Row(
@@ -59,7 +49,7 @@ class RelatedNotesWidget extends StatelessWidget {
                 style: GoogleFonts.manrope(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.onSurface,
+                  color: Colors.black87, 
                 ),
               ),
               const SizedBox(width: 8),
@@ -89,12 +79,19 @@ class RelatedNotesWidget extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceDark,
+                  color: Colors.white, 
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: Colors.white.withAlpha(15),
+                    color: Colors.black.withAlpha(15), 
                     width: 1,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(10),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    )
+                  ],
                 ),
                 child: Row(
                   children: [
@@ -116,7 +113,7 @@ class RelatedNotesWidget extends StatelessWidget {
                             style: GoogleFonts.manrope(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.onSurface,
+                              color: Colors.black87, 
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -126,7 +123,7 @@ class RelatedNotesWidget extends StatelessWidget {
                             note.content.isEmpty ? 'No content' : note.content,
                             style: GoogleFonts.manrope(
                               fontSize: 12,
-                              color: theme.colorScheme.outline,
+                              color: Colors.black54, 
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -142,14 +139,14 @@ class RelatedNotesWidget extends StatelessWidget {
                           _shortDate(note.updatedAt),
                           style: GoogleFonts.manrope(
                             fontSize: 11,
-                            color: theme.colorScheme.outline,
+                            color: Colors.black54, 
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         const SizedBox(height: 4),
                         CustomIconWidget(
                           iconName: 'chevron_right',
-                          color: theme.colorScheme.outline,
+                          color: Colors.black45, 
                           size: 16,
                         ),
                       ],

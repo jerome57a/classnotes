@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../../core/app_export.dart';
 import '../../../data/database/database_helper.dart';
 import '../../../data/models/note_model.dart';
